@@ -3,22 +3,44 @@ import { galleryItems } from './gallery-items.js';
 // 1 Создание и рендер разметки по массиву данных galleryItems и предоставленному шаблону элемента галереи.
 
 const galleryBoxEl = document.querySelector('.gallery');
-console.log(galleryBoxEl.innerHTML);
-const imagesListEl = [];
 
-galleryItems.forEach(el => { 
-    imagesListEl.push( `<div class="gallery__item"><a class="gallery__link" href=''>
-    <img
-        class="gallery__image"
-        src="${el.preview}" 
-        data-source="${el.original}"
-        alt="${el.description}"
-    /> </a> </div>`);
-    console.log(el.preview);
-    console.log(el.original);
-    console.log(el.description);
-});
+const galleryMarkup = galleryItems
+    .map(
+        ({ preview, original, description }, index) =>
+        `<li class="gallery__item">
+            <a class="gallery__link" href=''>
+            <img
+            class="gallery__image"
+            src="${preview}" 
+            data-source="${original}" 
+            alt="${description}" 
+            data-index="${index}"
+        /> </a>
+        </li>`,
+    )
+    .join('');
 
-galleryBoxEl.insertAdjacentHTML('afterbegin', imagesListEl);
+galleryBoxEl.innerHTML = galleryMarkup;
+// console.log(galleryMarkup);
+// Реализация делегирования на div.gallery и получение url большого изображения.
+galleryBoxEl.addEventListener('click', onImageClick);
 
-console.log(galleryItems);
+
+function onImageClick(event) {
+    event.preventDefault();
+    // console.log(event.target);
+    if (event.target.nodeName !== "IMG") {
+        return;
+    }
+    const imageHover = event.target.dataset.source;
+    const instance = basicLightbox.create(`
+    <div class="modal">
+      <img
+        class="gallery__image:hover"
+        src="${imageHover}" 
+    </div>
+`)
+
+instance.show()
+}
+
