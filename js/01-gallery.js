@@ -62,5 +62,5 @@ galleryBoxEl.addEventListener('click', onBigImageOpen);
         };
     }
 
-
+// console.log(galleryItems);
 
