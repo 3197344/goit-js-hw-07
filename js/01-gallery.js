@@ -4,6 +4,7 @@ import { galleryItems } from './gallery-items.js';
 
 const galleryBoxEl = document.querySelector('.gallery');
 
+
 const galleryMarkup = galleryItems
     .map(
         ({ preview, original, description }, index) =>
@@ -21,26 +22,45 @@ const galleryMarkup = galleryItems
     .join('');
 
 galleryBoxEl.innerHTML = galleryMarkup;
-// console.log(galleryMarkup);
-// Реализация делегирования на div.gallery и получение url большого изображения.
-galleryBoxEl.addEventListener('click', onImageClick);
+// вешаем слушателя события
+galleryBoxEl.addEventListener('click', onBigImageOpen);
 
-
-function onImageClick(event) {
+    function onBigImageOpen(event) {
+    // чтобы не перезагружалась страница
     event.preventDefault();
-    // console.log(event.target);
-    if (event.target.nodeName !== "IMG") {
-        return;
-    }
-    const imageHover = event.target.dataset.source;
-    const instance = basicLightbox.create(`
-    <div class="modal">
-      <img
-        class="gallery__image:hover"
-        src="${imageHover}" 
-    </div>
-`)
+ 
+    // проверяем условие, когда карточка с картинкой имеет класс 'gallery__image'
+    const classListImage = event.target.classList.contains('gallery__image');
+    console.log(event.target.classList);
+        if (classListImage == true) {
+            
+            // пускай изначально условие, что модалка закрыта 
+            let openModal = false;
+        
+            //  создаем модальное окно из библиотеки CDN сервис jsdelivr по ТЗ
+            const instance = basicLightbox.create(`
+            <img  class="gallery__image" src="${event.target.dataset.source}" >
+            `, onClose);
+                function onClose() {
+                    document.removeEventListener('keydown', closeModal)
+                };
 
-instance.show()
-}
+            // открываем модалку, если условие выше выполняется
+            openModal = instance.show();
+            
+            // закрытие модалки, при условии, что она открыта
+            if (openModal) {
+                // вешаем слушателя события
+                document.addEventListener('keydown', closeModal);
+            } 
+            function closeModal (event) {
+                if (event.key === 'Escape') {
+                    instance.close();
+                }  
+                console.log(event.key);       
+            }
+        };
+    }
+
+
 
